@@ -3,6 +3,9 @@ from fastapi.responses import JSONResponse
 
 from app.services.file_service import FileService
 
+from app.tasks.report_tasks import process_report_file
+from app.core.config import settings
+
 router_file = APIRouter()
 
 
@@ -24,6 +27,11 @@ async def export_report(file: UploadFile = File(...)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(exp)
         )
+
+    process_report_file.delay(
+        str(file_path),
+        str(settings.upload_dir / "reports")
+    )
 
     return JSONResponse(
         content={
