@@ -1,14 +1,15 @@
-# app/services/text_analyzer_service.py
 from collections import defaultdict
-import pymorphy2
 from pathlib import Path
+
+import pymorphy2
+
 
 class TextAnalyzerService:
     morph = pymorphy2.MorphAnalyzer()
 
     @staticmethod
     def normalize_word(word: str) -> str:
-        return TextAnalyzerService.morph.parse(word)[0].normal_form
+        return TextAnalyzerService.morph.parse(word)[0].normal_form # type: ignore
 
     @staticmethod
     def analyze_file(file_path: Path):
@@ -21,10 +22,8 @@ class TextAnalyzerService:
                 counts = defaultdict(int)
                 for w in words:
                     counts[w] += 1
-                # обновляем stats
                 for w, c in counts.items():
                     stats[w]["total"] += c
-                # для всех словоформ добавляем 0 если не встречалось в строке
                 for w in stats.keys():
                     stats[w]["per_line"].append(counts.get(w, 0))
         return stats
