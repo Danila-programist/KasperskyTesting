@@ -33,4 +33,4 @@ clean: ##@Code Remove Python cache files and directories
 %::
 	@echo $(MESSAGE)
 
-.PHONY: env deactivate help
+.PHONY: env deactivate help clean backend_up
