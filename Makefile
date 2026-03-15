@@ -14,15 +14,6 @@ endif
 env: ##@Environment Activate Poetry shell for backend
 	poetry shell
 
-up:  ##@Docker Start docker-compose services
-	docker-compose up -d  
-
-down:  ##@Docker Stop docker-compose services
-	docker-compose down
-
-rebuild: ##@Docker Rebuild and restart services
-	docker-compose down && docker-compose up -d --build
-
 backend_up: ##@Environment Start backend server
 	poetry run uvicorn main:app --host 0.0.0.0 --port 8000
 
