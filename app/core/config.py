@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     )
 
     FILE_STORAGE_PATH: Path = Path("tmp/uploads")
+    FILE_CHUNK_SIZE: int = 1024 * 1024  # 1 MB
 
     @property
     def upload_dir(self) -> Path:

@@ -3,9 +3,7 @@ from pathlib import Path
 import aiofiles
 from fastapi import UploadFile
 
-
-UPLOAD_DIR = Path("tmp/uploads")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+from app.core.config import settings   
 
 
 class FileStorage:
@@ -16,10 +14,12 @@ class FileStorage:
         Сохраняет файл на диск чанками
         """
 
-        file_path = UPLOAD_DIR / filename
+        upload_dir: Path = settings.upload_dir
+
+        file_path = upload_dir / filename
 
         async with aiofiles.open(file_path, "wb") as buffer:
-            while chunk := await file.read(1024 * 1024):
+            while chunk := await file.read(settings.FILE_CHUNK_SIZE):
                 await buffer.write(chunk)
 
         return str(file_path)
