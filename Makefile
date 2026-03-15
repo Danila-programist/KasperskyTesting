@@ -21,6 +21,15 @@ help: ##@Help Show this help
 	@echo -e "Usage: make [target] ...\n"
 	@perl -e '$(HELP_FUN)' $(MAKEFILE_LIST)
 
+clean: ##@Code Remove Python cache files and directories
+	@echo "Cleaning Python cache files..."
+	@echo "Removing __pycache__ directories with sudo..."
+	@for dir in $$(find . -type d -name "__pycache__"); do \
+		echo "Removing: $$dir"; \
+		sudo rm -rf "$$dir"; \
+	done
+	@echo "Python cache cleaned!"
+
 %::
 	@echo $(MESSAGE)
 
