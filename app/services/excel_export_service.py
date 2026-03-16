@@ -12,15 +12,15 @@ class ExcelExportService:
         Экспортирует статистику в Excel файл.
         """
         wb = Workbook(write_only=True)
-        ws = wb.create_sheet()
+        ws = wb.create_sheet(title="Статистика")
         ws.append(["Словоформа", "Всего", "По строкам"])
 
-        stats = result["stats"]
-        total_lines = result["total_lines"]
+        per_line_str = ",".join(str(x) for x in result["per_line"])
 
-        for word, data in stats.items():
-            per_line_map = data["per_line"]
-            per_line = ",".join(str(per_line_map.get(i, 0)) for i in range(total_lines))
-            ws.append([word, data["total"], per_line])
-
+        ws.append([
+            result["word"],          
+            result["total"],          
+            per_line_str              
+        ])
+        
         wb.save(output_path)
