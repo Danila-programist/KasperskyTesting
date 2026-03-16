@@ -10,7 +10,7 @@ class ExcelExportService:
     @staticmethod
     def export_stats(result: dict, output_path: Path):
         wb = Workbook(write_only=True)
-        ws = cast(Worksheet, wb.active)
+        ws = wb.create_sheet()
         ws.append(["Словоформа", "Всего", "По строкам"])
 
         stats = result["stats"]

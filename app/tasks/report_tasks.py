@@ -26,9 +26,6 @@ def process_report_file(file_path: str, output_dir: str):
         ExcelExportService.export_stats(stats, output_file)
 
         return str(output_file)
-    finally:
-        try:
-            file_path_obj.unlink(missing_ok=True)
-        except Exception:
-            pass
+    except Exception as exp:
+        raise exp
         
