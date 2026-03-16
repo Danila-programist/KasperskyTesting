@@ -12,10 +12,7 @@ class Settings(BaseSettings):
     - из .env файла
     """
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     FILE_STORAGE_PATH: Path = Path("tmp/uploads")
     FILE_CHUNK_SIZE: int = 1024 * 1024  # 1 MB

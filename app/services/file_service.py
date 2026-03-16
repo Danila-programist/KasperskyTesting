@@ -6,7 +6,6 @@ from app.infrastructure.file_storage import FileStorage
 
 
 class FileService:
-
     @staticmethod
     async def save_upload_file(file: UploadFile) -> str:
         """

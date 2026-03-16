@@ -2,6 +2,7 @@ from typing import Dict, Set, List
 from pathlib import Path
 import re
 
+
 class TextAnalyzerService:
     TARGET_FORMS: Set[str] = {"житель", "жителем"}
     TARGET_LEMMA: str = "житель"
@@ -21,12 +22,13 @@ class TextAnalyzerService:
         """
 
         total_count: int = 0
-        line_counts: List[int] = [] 
+        line_counts: List[int] = []
 
         with open(file_path, "r", encoding="utf-8") as f:
             for line in f:
-
-                words: List[str] = re.findall(r"[А-Яа-яЁё]+", line.lower()) # извлечение слов из строки
+                words: List[str] = re.findall(
+                    r"[А-Яа-яЁё]+", line.lower()
+                )  # извлечение слов из строки
 
                 if not words:
                     line_counts.append(0)
@@ -35,17 +37,17 @@ class TextAnalyzerService:
                 line_count = 0
 
                 for word in words:
-                    if word in cls.TARGET_FORMS:  
+                    if word in cls.TARGET_FORMS:
                         line_count += 1
 
                 line_counts.append(line_count)
                 total_count += line_count
 
-        words_str: str = ", ".join(sorted(cls.TARGET_FORMS)) 
+        words_str: str = ", ".join(sorted(cls.TARGET_FORMS))
 
         return {
             "total": total_count,
             "per_line": line_counts,
             "total_lines": len(line_counts),
-            "word": words_str  
+            "word": words_str,
         }

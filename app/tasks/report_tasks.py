@@ -14,6 +14,7 @@ celery_app.conf.update(
     result_backend=settings.CELERY_RESULT_BACKEND,
 )
 
+
 @celery_app.task
 def process_report_file(file_path: str, output_dir: str) -> None:
     """
@@ -33,4 +34,3 @@ def process_report_file(file_path: str, output_dir: str) -> None:
 
     except Exception as exp:
         raise exp
-        

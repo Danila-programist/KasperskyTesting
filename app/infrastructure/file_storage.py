@@ -3,11 +3,10 @@ from pathlib import Path
 import aiofiles
 from fastapi import UploadFile
 
-from app.core.config import settings   
+from app.core.config import settings
 
 
 class FileStorage:
-
     @staticmethod
     async def save_file(file: UploadFile, filename: str) -> str:
         """

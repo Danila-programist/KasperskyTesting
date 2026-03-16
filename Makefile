@@ -11,6 +11,12 @@ else
 MESSAGE = "Done"
 endif
 
+lint: ##@Code Run ruff linter
+	poetry run ruff check .
+
+format: ##@Code Run ruff formatter
+	poetry run ruff format .
+
 env: ##@Environment Activate Poetry shell for backend
 	poetry shell
 

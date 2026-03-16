@@ -18,24 +18,14 @@ async def export_report(file: UploadFile = File(...)):
     try:
         file_path: str = await FileService.save_upload_file(file)
     except ValueError as exp:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exp)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exp))
     except Exception as exp:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(exp)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exp)
         )
 
-    process_report_file.delay(
-        file_path,
-        str(settings.upload_dir / "reports")
-    )
+    process_report_file.delay(file_path, str(settings.upload_dir / "reports"))
 
     return JSONResponse(
-        content={
-            "message": "Файл успешно загружен",
-            "file_path": str(file_path)
-        }
+        content={"message": "Файл успешно загружен", "file_path": str(file_path)}
     )
