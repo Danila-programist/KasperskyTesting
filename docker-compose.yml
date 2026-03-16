@@ -4,4 +4,40 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    networks:                     
+      - app-network 
+
+  celery-worker:
+    build: .
+    command: poetry run celery -A app.tasks.report_tasks.celery_app worker --loglevel=info
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0 
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    volumes:
+      - ./tmp/uploads:/app/tmp/uploads
+    networks:                     
+      - app-network 
+
+  fastapi:
+    build: .
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - celery-worker
+    volumes:
+      - ./tmp/uploads:/app/tmp/uploads
+      - ./app:/app/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0  
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    networks:
+      - app-network
     restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge

@@ -17,6 +17,18 @@ env: ##@Environment Activate Poetry shell for backend
 backend_up: ##@Environment Start backend server
 	poetry run uvicorn main:app --host 0.0.0.0 --port 8000
 
+docker_up: ##@Docker Start all Docker services (redis, celery-worker, backend)
+	docker-compose up -d
+
+docker_rebuild: ##@Docker Rebuild all Docker services
+	docker-compose up -d --build
+
+docker_logs: ##@Docker View Docker logs
+	docker-compose logs -f
+
+docker_down: ##@Docker Stop all Docker services
+	docker-compose down
+
 help: ##@Help Show this help 
 	@echo -e "Usage: make [target] ...\n"
 	@perl -e '$(HELP_FUN)' $(MAKEFILE_LIST)
