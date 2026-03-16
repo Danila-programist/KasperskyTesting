@@ -1,14 +1,16 @@
 from pathlib import Path
-from typing import cast
 
 from openpyxl import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
+
 
 
 class ExcelExportService:
 
     @staticmethod
-    def export_stats(result: dict, output_path: Path):
+    def export_stats(result: dict, output_path: Path) -> None:
+        """
+        Экспортирует статистику в Excel файл.
+        """
         wb = Workbook(write_only=True)
         ws = wb.create_sheet()
         ws.append(["Словоформа", "Всего", "По строкам"])
@@ -22,4 +24,3 @@ class ExcelExportService:
             ws.append([word, data["total"], per_line])
 
         wb.save(output_path)
-        return output_path

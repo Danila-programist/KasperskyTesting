@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict
 
 from celery import Celery
 
@@ -14,18 +15,22 @@ celery_app.conf.update(
 )
 
 @celery_app.task
-def process_report_file(file_path: str, output_dir: str):
+def process_report_file(file_path: str, output_dir: str) -> None:
+    """
+    Асинхронная Celery-задача для обработки загруженного текстового файла.
+    Функция выполняет анализ текстового файла и создаёт Excel-отчёт со статистикой.
+    Запускается в фоновом режиме после загрузки файла через API.
+    """
     file_path_obj = Path(file_path)
     output_dir_obj = Path(output_dir)
     output_dir_obj.mkdir(parents=True, exist_ok=True)
 
     try:
-        stats = TextAnalyzerService.analyze_file(file_path_obj)
+        stats: Dict = TextAnalyzerService.analyze_file(file_path_obj)
 
         output_file = output_dir_obj / f"{file_path_obj.stem}.xlsx"
         ExcelExportService.export_stats(stats, output_file)
 
-        return str(output_file)
     except Exception as exp:
         raise exp
         

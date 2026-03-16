@@ -1,48 +1,51 @@
-from collections import defaultdict
-from typing import Dict
+from typing import Dict, Set, List
 from pathlib import Path
 import re
 
-from pymystem3 import Mystem
-
-
 class TextAnalyzerService:
-    mystem = Mystem()  # инициализация движка Mystem
+    TARGET_FORMS: Set[str] = {"житель", "жителем"}
+    TARGET_LEMMA: str = "житель"
 
-    @staticmethod
-    def normalize_word(word: str) -> str:
+    @classmethod
+    def analyze_file(cls, file_path: Path) -> Dict:
         """
-        Лемматизация слова с помощью Mystem
-        """
-        lemma = TextAnalyzerService.mystem.lemmatize(word)
-        return lemma[0] if lemma else word
+        Анализирует файл и собирает статистику для форм "житель" и "жителем",
+        объединяя их в одну статистику для слова "житель".
 
-    @staticmethod
-    def analyze_file(file_path: Path) -> Dict:
+        Returns:
+            Dict с полями:
+            - total: общее количество упоминаний
+            - per_line: список количества упоминаний по строкам
+            - total_lines: общее количество строк
+            - word: строка с целевыми формами через запятую
         """
-        Возвращает статистику:
-        - total: общее количество словоформы в документе
-        - per_line: разреженное представление {line_index: count}
-        - total_lines: количество строк в файле
-        """
-        stats: Dict[str, dict] = defaultdict(lambda: {"total": 0, "per_line": {}})
-        total_lines = 0
+
+        total_count: int = 0
+        line_counts: List[int] = [] 
 
         with open(file_path, "r", encoding="utf-8") as f:
-            for line_idx, line in enumerate(f):
-                total_lines = line_idx + 1
-                tokens = re.findall(r"[A-Za-zА-Яа-яЁё]+", line)
-                if not tokens:
+            for line in f:
+
+                words: List[str] = re.findall(r"[А-Яа-яЁё]+", line.lower()) # извлечение слов из строки
+
+                if not words:
+                    line_counts.append(0)
                     continue
 
-                counts = defaultdict(int)
-                for raw in tokens:
-                    w = TextAnalyzerService.normalize_word(raw.lower())
-                    if w:
-                        counts[w] += 1
+                line_count = 0
 
-                for w, c in counts.items():
-                    stats[w]["total"] += c
-                    stats[w]["per_line"][line_idx] = c
+                for word in words:
+                    if word in cls.TARGET_FORMS:  
+                        line_count += 1
 
-        return {"stats": stats, "total_lines": total_lines}
+                line_counts.append(line_count)
+                total_count += line_count
+
+        words_str: str = ", ".join(sorted(cls.TARGET_FORMS)) 
+
+        return {
+            "total": total_count,
+            "per_line": line_counts,
+            "total_lines": len(line_counts),
+            "word": words_str  
+        }

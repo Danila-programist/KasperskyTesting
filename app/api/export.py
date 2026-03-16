@@ -12,11 +12,11 @@ router_file = APIRouter()
 @router_file.post("/public/report/export")
 async def export_report(file: UploadFile = File(...)):
     """
-    Endpoint принимает файл и передает его в сервисный слой для дальнейшей обработки в Celery worker.
+    Ручка, которая принимает файл и передает его в сервисный слой для дальнейшей обработки и сохранение на сервере файла в excel формате.
     """
 
     try:
-        file_path = await FileService.save_upload_file(file)
+        file_path: str = await FileService.save_upload_file(file)
     except ValueError as exp:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -29,7 +29,7 @@ async def export_report(file: UploadFile = File(...)):
         )
 
     process_report_file.delay(
-        str(file_path),
+        file_path,
         str(settings.upload_dir / "reports")
     )
 

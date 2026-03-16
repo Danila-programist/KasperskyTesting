@@ -11,7 +11,7 @@ class FileStorage:
     @staticmethod
     async def save_file(file: UploadFile, filename: str) -> str:
         """
-        Сохраняет файл на диск чанками
+        Сохраняет файл на диск чанками и отдает путь до файла на сервере
         """
 
         upload_dir: Path = settings.upload_dir
