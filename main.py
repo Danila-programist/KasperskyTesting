@@ -8,4 +8,4 @@ app = FastAPI(title="API for Upload Files")
 app.include_router(router_file)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="main:app", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -9,7 +9,7 @@ from app.core.config import settings
 router_file = APIRouter()
 
 
-@router_file.post("/public/upload/export")
+@router_file.post("/public/report/export")
 async def export_report(file: UploadFile = File(...)):
     """
     Endpoint принимает файл и передает его в сервисный слой для дальнейшей обработки в Celery worker.
@@ -36,6 +36,6 @@ async def export_report(file: UploadFile = File(...)):
     return JSONResponse(
         content={
             "message": "Файл успешно загружен",
-            "file_path": file_path
+            "file_path": str(file_path)
         }
     )

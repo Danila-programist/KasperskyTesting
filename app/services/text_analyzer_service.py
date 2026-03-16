@@ -1,29 +1,48 @@
 from collections import defaultdict
+from typing import Dict
 from pathlib import Path
+import re
 
-import pymorphy2
+from pymystem3 import Mystem
 
 
 class TextAnalyzerService:
-    morph = pymorphy2.MorphAnalyzer()
+    mystem = Mystem()  # инициализация движка Mystem
 
     @staticmethod
     def normalize_word(word: str) -> str:
-        return TextAnalyzerService.morph.parse(word)[0].normal_form # type: ignore
+        """
+        Лемматизация слова с помощью Mystem
+        """
+        lemma = TextAnalyzerService.mystem.lemmatize(word)
+        return lemma[0] if lemma else word
 
     @staticmethod
-    def analyze_file(file_path: Path):
-        stats = defaultdict(lambda: {"total": 0, "per_line": []})
+    def analyze_file(file_path: Path) -> Dict:
+        """
+        Возвращает статистику:
+        - total: общее количество словоформы в документе
+        - per_line: разреженное представление {line_index: count}
+        - total_lines: количество строк в файле
+        """
+        stats: Dict[str, dict] = defaultdict(lambda: {"total": 0, "per_line": {}})
+        total_lines = 0
 
         with open(file_path, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                words = [TextAnalyzerService.normalize_word(w) for w in line.split()]
+            for line_idx, line in enumerate(f):
+                total_lines = line_idx + 1
+                tokens = re.findall(r"[A-Za-zА-Яа-яЁё]+", line)
+                if not tokens:
+                    continue
+
                 counts = defaultdict(int)
-                for w in words:
-                    counts[w] += 1
+                for raw in tokens:
+                    w = TextAnalyzerService.normalize_word(raw.lower())
+                    if w:
+                        counts[w] += 1
+
                 for w, c in counts.items():
                     stats[w]["total"] += c
-                for w in stats.keys():
-                    stats[w]["per_line"].append(counts.get(w, 0))
-        return stats
+                    stats[w]["per_line"][line_idx] = c
+
+        return {"stats": stats, "total_lines": total_lines}

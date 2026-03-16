@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     FILE_STORAGE_PATH: Path = Path("tmp/uploads")
     FILE_CHUNK_SIZE: int = 1024 * 1024  # 1 MB
 
+    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/1"
+
     @property
     def upload_dir(self) -> Path:
         """

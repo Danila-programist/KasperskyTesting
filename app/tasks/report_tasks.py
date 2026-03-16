@@ -4,22 +4,31 @@ from celery import Celery
 
 from app.services.text_analyzer_service import TextAnalyzerService
 from app.services.excel_export_service import ExcelExportService
+from app.core.config import settings
 
-celery_app = Celery(
-    "tasks",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/1"
+celery_app = Celery("tasks")
+
+celery_app.conf.update(
+    broker_url=settings.CELERY_BROKER_URL,
+    result_backend=settings.CELERY_RESULT_BACKEND,
 )
 
 @celery_app.task
 def process_report_file(file_path: str, output_dir: str):
-    file_path = Path(file_path)
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    file_path_obj = Path(file_path)
+    output_dir_obj = Path(output_dir)
+    output_dir_obj.mkdir(parents=True, exist_ok=True)
 
-    stats = TextAnalyzerService.analyze_file(file_path)
+    try:
+        stats = TextAnalyzerService.analyze_file(file_path_obj)
 
-    output_file = output_dir / f"{file_path.stem}.xlsx"
-    ExcelExportService.export_stats(stats, output_file)
+        output_file = output_dir_obj / f"{file_path_obj.stem}.xlsx"
+        ExcelExportService.export_stats(stats, output_file)
 
-    return str(output_file)
+        return str(output_file)
+    finally:
+        try:
+            file_path_obj.unlink(missing_ok=True)
+        except Exception:
+            pass
+        
